@@ -1,0 +1,6 @@
+﻿dynamic dispatch: substite one concrete function implementation to another at run time without disturbing the caller
+
+- in this course you will learn:
+	1- A number of practical advices
+	2- How to detect design issues
+	3- How to overcome these shortcomings
