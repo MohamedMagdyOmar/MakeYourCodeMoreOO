@@ -16,7 +16,7 @@ namespace MakeYourCodeMoreOO
     ///     - account holder can close the account at any time
     ///     - Closed account does not allow deposit and withdraw
     ///     
-    ///- there is something branch, there are many branches in "withdraw" method, that the code that test this funtion is explicit
+    ///- there is something bad, there are many branches in "withdraw" method, that the code that test this funtion is explicit
     ///- why it bad? explicit condition test making the execution of our code complicated
     ///- Advice:
     ///     - donot keep money as decimal.
@@ -35,6 +35,7 @@ namespace MakeYourCodeMoreOO
             if (this.IsClosed)
                 return; // Or do something else..
             // Deposit Money
+            this.Balance += amount;
         }
 
         public void Withdraw(decimal amount)
