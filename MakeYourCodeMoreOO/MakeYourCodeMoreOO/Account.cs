@@ -21,6 +21,34 @@ namespace MakeYourCodeMoreOO
     ///- Advice:
     ///     - donot keep money as decimal.
     ///     - introduce special "money" class to keep "amount" and "currency" together
+    ///     
+    ///  How Many ways to excute the "deposit" method?
+    ///  you have 2 ways : 1- either "IsClosed" is satisfied 2- or not satisfied
+    ///  so we need 2 test cases to test "deposit" method
+    ///  
+    /// How Many Test cases needed for "Withdraw" method?
+    /// you have 3 test cases
+    /// 
+    /// Customer Requirement 3:
+    /// - Account should be frozen if not used for some time.
+    /// - Account will be unfrozen automatically on deposit or withdraw
+    /// - Unfreezing the account triggers a custom action
+    /// 
+    /// - you know began to feel that the class become more complex
+    /// - now "deposit" function need more tests:
+    ///     - deposit invoked on frozen account
+    ///     - check that account is unfrozen after depositing
+    ///     - call back function is not called if account is unforzen
+    ///     
+    /// - now "withdraw" function need more tests:
+    ///     - deposit invoked on frozen account
+    ///     - check that account is unfrozen after depositing
+    ///     - call back function is not called if account is unforzen
+    ///     - ...
+    ///     
+    /// - ADVICE:
+    ///     - Start worrying as soon as number of unit tests has started to double with every new feature added.
+    ///     - this problem can be solved using "State" design pattern
     /// </summary>
     class Account
     {
@@ -34,8 +62,24 @@ namespace MakeYourCodeMoreOO
             // Customer Requirement 2:
             if (this.IsClosed)
                 return; // Or do something else..
+
+            // Customer Requirement 3
+            if (this.IsFrozen)
+            {
+                this.IsFrozen = false;
+                this.OnUnFreeze();
+            }
             // Deposit Money
             this.Balance += amount;
+        }
+
+        // Customer Requirement 3
+        private bool IsFrozen { get; set; }
+        private Action OnUnFreeze { get; }
+
+        public Account(Action onUnfreeze)
+        {
+            this.OnUnFreeze = onUnfreeze;
         }
 
         public void Withdraw(decimal amount)
@@ -46,6 +90,13 @@ namespace MakeYourCodeMoreOO
             // Customer Requirement 2:
             if (!this.IsClosed)
                 return; // or do something else
+
+            // Customer Requirement 3
+            if (this.IsFrozen)
+            {
+                this.IsFrozen = false;
+                this.OnUnFreeze();
+            }
 
             this.Balance -= amount;
         }
@@ -59,6 +110,16 @@ namespace MakeYourCodeMoreOO
         public void Close()
         {
             this.IsClosed = true;
+        }
+
+        // Customer Requirement 3
+        public void Freeze()
+        {
+            if (this.IsClosed)
+                return; // Account must not be closed
+            if (this.isVerified)
+                return; // Account must be verified
+            this.IsFrozen = true;
         }
     }
 }
