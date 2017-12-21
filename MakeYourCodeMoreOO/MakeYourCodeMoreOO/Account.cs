@@ -49,6 +49,30 @@ namespace MakeYourCodeMoreOO
     /// - ADVICE:
     ///     - Start worrying as soon as number of unit tests has started to double with every new feature added.
     ///     - this problem can be solved using "State" design pattern
+    /// 
+    ///  Modification 1:
+    /// - to simply my class firstly i implement a method called "ManageUnfreezing", and move logic to it
+    /// - we introduced "else" branch in this method that "Do Nothing", but why we do this?
+    /// - we do this to make the implementation symmetric
+    /// 
+    ///   Modification 2:
+    /// - there another better option for making implementation symmetric is to introduce "Guard Clause"
+    /// - the code after the "Guard Clause" is executed unconditionally    
+    /// ADVICE:
+    ///     - avoid incomplete "if-then" instructions without "else" or use "guard clause"
+    /// 
+    /// Modification 3:    
+    /// - after creating new method "ManageUnfreezing", and add its logic to it, i will make further change on this method
+    /// - inside it i will implement 2 additionally methods "UnFreeze()", and "StayUnfrozen()"
+    /// 
+    /// Modification 4:
+    /// convert the created method "ManageUnfreezing" into a delegate
+    /// 
+    /// Modification 5:
+    /// - initially the account is unfrozen
+    /// - the target of this solution, instead of using boolean flag to decide the status (free or unFreeze) we used delegate that points to the status
+    /// 
+    /// the next step is to move the all manage freeze to new class
     /// </summary>
     class Account
     {
@@ -57,29 +81,106 @@ namespace MakeYourCodeMoreOO
 
         // Customer Requirement 2:
         private bool IsClosed { get; set; }
-        public void Deposit(decimal amount)
-        {
-            // Customer Requirement 2:
-            if (this.IsClosed)
-                return; // Or do something else..
-
-            // Customer Requirement 3
-            if (this.IsFrozen)
-            {
-                this.IsFrozen = false;
-                this.OnUnFreeze();
-            }
-            // Deposit Money
-            this.Balance += amount;
-        }
 
         // Customer Requirement 3
-        private bool IsFrozen { get; set; }
+        // Modification 5:
+        // private bool IsFrozen { get; set; }
         private Action OnUnFreeze { get; }
 
         public Account(Action onUnfreeze)
         {
             this.OnUnFreeze = onUnfreeze;
+
+            //this.ManageUnfreezing = () =>
+            //{
+            //    if (this.IsFrozen)
+            //    {
+
+            //    }
+            //    else
+            //    {
+            //        this.StayUnfrozen();
+            //    }
+            //};
+
+
+            // Modification 5:
+            this.ManageUnfreezing = this.StayUnfrozen;
+        }
+
+        public void Deposit(decimal amount)
+        {
+            // Customer Requirement 2:
+            if (this.IsClosed)
+                return; // Or do something else...
+
+            //// Customer Requirement 3
+            //if (this.IsFrozen)
+            //{
+            //    this.IsFrozen = false;
+            //    this.OnUnFreeze();
+            //}
+
+            this.ManageUnfreezing();
+
+            // Deposit Money
+            this.Balance += amount;
+        }
+
+        // Modification 4:
+        private Action ManageUnfreezing { get; set; }
+
+        //private void ManageUnfreezing()
+        //{
+        //    // Modification 1:
+
+        //    //// Customer Requirement 3
+        //    //if (this.IsFrozen)
+        //    //{
+        //    //    this.IsFrozen = false;
+        //    //    this.OnUnFreeze();
+        //    //}
+
+        //    //// -we introduced "else" branch in this method
+        //    //else
+        //    //{
+        //    //    // Do Nothing
+        //    //}
+
+        //    // Modification 2:
+        //    //if (!this.IsFrozen) // another option to introduce "Guard Clause"
+        //    //    return;
+
+        //    //this.IsFrozen = false;
+        //    //this.OnUnFreeze();
+
+
+        //    // Modification 3:
+        //    if(this.IsFrozen)
+        //    {
+        //        this.Unfreeze();
+        //    }
+        //    else
+        //    {
+        //        this.StayUnfrozen();
+        //    }
+        //}
+
+        // Modification 3:
+        private void Unfreeze()
+        {
+            // Modification 5:
+            // this.IsFrozen = false;
+            this.OnUnFreeze();
+
+            // Modification 5
+            this.ManageUnfreezing = this.StayUnfrozen;
+        }
+
+        // Modification 3:
+        private void StayUnfrozen()
+        {
+
         }
 
         public void Withdraw(decimal amount)
@@ -91,12 +192,13 @@ namespace MakeYourCodeMoreOO
             if (!this.IsClosed)
                 return; // or do something else
 
-            // Customer Requirement 3
-            if (this.IsFrozen)
-            {
-                this.IsFrozen = false;
-                this.OnUnFreeze();
-            }
+            //// Customer Requirement 3
+            //if (this.IsFrozen)
+            //{
+            //    this.IsFrozen = false;
+            //    this.OnUnFreeze();
+            //}
+            this.ManageUnfreezing();
 
             this.Balance -= amount;
         }
@@ -119,7 +221,12 @@ namespace MakeYourCodeMoreOO
                 return; // Account must not be closed
             if (this.isVerified)
                 return; // Account must be verified
-            this.IsFrozen = true;
+
+            // Modification 5:
+            //this.IsFrozen = true;
+
+            // Modification 5
+            this.ManageUnfreezing = this.Unfreeze;
         }
     }
 }
