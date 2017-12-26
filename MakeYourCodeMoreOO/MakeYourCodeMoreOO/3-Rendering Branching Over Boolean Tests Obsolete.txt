@@ -1,0 +1,2 @@
+﻿1- taregt of this module is :
+	- we will keep complexity check by turning "branching logic" into "explicit state".
